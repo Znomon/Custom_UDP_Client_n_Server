@@ -2,7 +2,9 @@ import socket
 
 UDP_IP = "127.0.0.1"
 UDP_PORT = 1050
-MESSAGE = "Hello, World!"
+MESSAGE = "REG,znomon;"
+#MESSAGE = "URG,znomon;"
+#MESSAGE = "QUO,znomon;"
 
 print "UDP target IP:", UDP_IP
 print "UDP target port:", UDP_PORT
