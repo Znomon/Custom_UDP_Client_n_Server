@@ -11,24 +11,37 @@ sock.bind((UDP_IP, UDP_PORT))
 
 def main():
     userList = list()
+    commands = ["REG","UNR","QUO"]
 
     while True:
-        data, addr = sock.recvfrom(512) # buffer size is 512 bytes
-        frameArray = data.split(",")
-        if frameArray[0] == "REG":
+        data, addr = sock.recvfrom(512) 				# buffer size is 512 bytes
+        frameArray = data.split(",")					#break up string on delimiter
+        username =  frameArray[1]						#username is equal to the second delimited string
+        username = username[:-1]						#username still includes a semicolon, strip that away
+
+        if frameArray[0] not in commands:
+        	sock.sendto("INC;", addr)
+
+        if frameArray[0] == "REG":						#if first delimited string is REGister
             print "Register"
-            username =  frameArray[1]
             print "fA[1]: ", frameArray[1]
-            username = username[:-1]
             print "username: ", username
-            if username in userList:
+            if username in userList:					#if username already exists
                 print "username exists"
-                sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+                sock.sendto("UAE;", addr)				#send UserAlreadyExists UAE;
             else:
-                userList.append(username)
+                userList.append(username)				#otherwise add username
                 print "username added"
+                sock.sendto("ROK;", addr)				#and then send Request OK
         elif frameArray[0] == "URG":
             print "Unregister"
+            if username in userList:					#if user exists
+                userList.remove(username)
+                sock.sendto("ROK;", addr)
+            else:
+                userList.append(username)				#otherwise add username
+                print "username added"
+                sock.sendto("UNR;", addr)				#and then send Request OK
         elif frameArray[0] == "QUO":
             print "Quotes"
 
