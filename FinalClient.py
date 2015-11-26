@@ -8,12 +8,14 @@ UDP_PORT = 1050
 print "UDP target IP:", UDP_IP
 print "UDP target port:", UDP_PORT
 
-MESSAGE = raw_input("Please enter your packet: ")
+while 1:
+    
+    MESSAGE = raw_input("Please enter your packet: ")
 
-sock = socket.socket(socket.AF_INET, # Internet
+    sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
-sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+    sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
 
-data, addr = sock.recvfrom(512) # buffer size is 512 bytes
+    data, addr = sock.recvfrom(512) # buffer size is 512 bytes
 
-print data
+    print data

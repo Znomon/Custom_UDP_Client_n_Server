@@ -16,13 +16,17 @@ def main():
     while True:
         data, addr = sock.recvfrom(512) 				# buffer size is 512 bytes
         frameArray = data.split(",")					#break up string on delimiter
-        username =  frameArray[1]						#username is equal to the second delimited string
-        username = username[:-1]						#username still includes a semicolon, strip that away
+        username =  frameArray[1]					#username is equal to the second delimited string
+        username = username[:-1]					#username still includes a semicolon, strip that away
+        username = username.upper()                                     #stores all usernames as uppercase because usernames are not case sensitive
+        if not(username.isalnum()):                                     #if username is alpha-numeric
+            print "Invalid Username sent"
+            sock.sendto("INU;", addr)                                   #else send INvalid Username
 
-        if frameArray[0] not in commands:
-        	sock.sendto("INC;", addr)
+        if frameArray[0] not in commands:                               #if command is not in the list of acceptable commands
+        	sock.sendto("INC;", addr)                               #send INvalid Command
 
-        if frameArray[0] == "REG":						#if first delimited string is REGister
+        if frameArray[0] == "REG":					#if first delimited string is REGister
             print "Register"
             print "fA[1]: ", frameArray[1]
             print "username: ", username
@@ -33,14 +37,13 @@ def main():
                 userList.append(username)				#otherwise add username
                 print "username added"
                 sock.sendto("ROK;", addr)				#and then send Request OK
-        elif frameArray[0] == "URG":
+        elif frameArray[0] == "UNR":
             print "Unregister"
             if username in userList:					#if user exists
                 userList.remove(username)
                 sock.sendto("ROK;", addr)
             else:
-                userList.append(username)				#otherwise add username
-                print "username added"
+                print "username doesnt exist, can't remove"
                 sock.sendto("UNR;", addr)				#and then send Request OK
         elif frameArray[0] == "QUO":
             print "Quotes"
