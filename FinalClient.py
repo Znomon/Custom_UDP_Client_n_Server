@@ -1,7 +1,8 @@
 import socket
 import time #Needed for sleep command
+import select #Needed for select function
 
-UDP_IP = "66.158.200.153"
+UDP_IP = "127.0.0.1"
 UDP_PORT = 1050
 #MESSAGE = "URG,znomon;"
 #MESSAGE = "QUO,znomon;"
@@ -19,19 +20,16 @@ while 1:
 
     sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
-
+    sock.setblocking(0)
+    
     while 1: #Try to resend packet every 5 seconds if it gets lost
-        try: 
-            sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
-            print "packet sent"
+        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+        print "Packet sent"
+        ready = select.select([sock], [], [], 5) #Wait until received packet or 5 seconds
+        if ready[0]: #If received packet within 5 seconds
             data, addr = sock.recvfrom(512) # buffer size is 512 bytes
-            if data: #If successfully sends break from loop
-                break
-            time.sleep(5) #Wait five seconds
-        except ValueError:
-            print "Resending Packet..."
-
-    print data;
+            print "data = ", data;
+            break
     
     if "QUO" in MESSAGE: #Store the stocks user asks for in a list
         MESSAGE = MESSAGE[:-1] #Remove ; at end of string
